@@ -686,6 +686,7 @@ var alunos = [
     }
 ];
 
+//Function para filtrar os alunos pela matricula // status: Funcionando
 const alunosFilter = (id) => {
     let matriculaAluno = id;
     let erro = true;
@@ -713,46 +714,128 @@ const alunosFilter = (id) => {
     }
 }
 
-const getAlunosCurso = (id) => {
-    let cursoAluno = id;
-    let erro = true;
-    let listaInfosCurso = [];
+//Function para pegar/mostrar todos os alunos // status: Funcionando
+const getAlunos = () => {
+    let listaDeTodosAlunos = []
 
-    if (typeof (cursoAluno) != 'undefined') {
-        alunos.forEach(item => {
-            if (item.curso.toLowerCase().includes(cursoAluno.toLowerCase())) {
-                let cursos = {}
-
-                cursos.nomeCurso = info.nome
-                cursos.siglaCurso = info.sigla
-                cursos.iconeCurso = info.icone
-                cursos.cargaCurso = info.carga
-                cursos.conclusaoCurso = info.conclusao
-
-                listaInfosCurso.push(cursos)
-                erro = false
-
-            }
+    alunos.forEach(item => {
+        item.curso.forEach(infos => {
+            listaDeTodosAlunos.push(
+                {
+                    foto: item.foto,
+                    nome: item.nome,
+                    matricula: item.matricula,
+                    sexo: item.sexo,
+                    nomeCurso: infos.nome
+                }
+            )
         })
+    })
+    return listaDeTodosAlunos
+}
 
-    }
+//Function para mostrar o curso/disciplina do aluno // status: Funcionando
+const getAlunoCurso = (id = '') => {
+    let matriculaAluno = id;
+    let erro = true
+    let descricaoDisciplina = [];
+
+    alunos.forEach(item => {
+        item.curso.forEach(i => {
+            i.disciplinas.forEach(info => {
+                if (item.matricula == matriculaAluno) {
+                    descricaoDisciplina.push(
+                        {
+                            nomeAluno: item.nome,
+                            nomeCurso: i.nome,
+                            nomeDisciplina: info.nome,
+                            media: info.media,
+                            carga: info.carga,
+                            statusAluno: info.status
+                        }
+                    )
+                    erro = false
+                }
+            })
+        })
+    })
     if (erro) {
-        return false;
+        return false
     } else {
-        return listaInfosCurso
+        return descricaoDisciplina
     }
 }
 
+//Pegar/Mostrar aluno de cada curso // status: Funcionando
+const getAlunoDisciplina = (id) => {
+    let disciplinaAluno = id.toUpperCase();
+    let erro = true;
+    let listAlunoDisciplina = [];
+
+    alunos.forEach(item => {
+        item.curso.forEach(info => {
+            if (info.nome.toUpperCase().includes(disciplinaAluno.toUpperCase())) {
+                let aluno = {}
+
+                aluno.fotoAluno = item.foto
+                aluno.nomeAluno = item.nome
+                aluno.matriculaAluno =  item.matricula
+                aluno.sexoAluno = item.sexo
+                aluno.nomeCursoAluno = info.nome
+                listAlunoDisciplina.push(aluno)
+
+                erro = false
+            }
+        })
+    })
+    if (erro) {
+        return false
+    } else {
+        return listAlunoDisciplina
+    }
+}
+
+//Fazer uma Function para filtrar os anos de conclusao!!!!!!!!!!!!!
+
+//Function para filtrar alunos pelo ano de conclusao 
+const alunoAno = (id) => {
+    let anoDeConclusao = id;
+    let erro = true;
+    let listAlunosByAno = [];
+
+    if (typeof (anoDeConclusao) != 'undefined') {
+        alunos.forEach(item => {
+            item.curso.forEach(get => {
+                if (get.conclusao.toLowerCase().includes(anoDeConclusao.toLowerCase())) {
+                    let ano = {}
+
+                    ano.anoConclusao = get.conclusao
+                    ano.alunoNome = item.nome
+                    ano.matriculaAluno = item.matricula
+                    ano.fotoAluno = item.foto
+                    listAlunosByAno.push(ano)
+                    erro = false
+                }
+            })
+        })
+    }
+    if (erro) {
+        return false
+    } else {
+        return listAlunosByAno
+    }
+}
+
+module.exports = {
+    alunosFilter, getAlunos, getAlunoCurso,
+    getAlunoDisciplina, alunoAno
+}
+
+// console.log(getAlunos());
 
 
-console.log(getAlunosCurso('DS'));
+//Fazer uma Function para filtrar os anos de conclusao!!!!!!!!!!!!!
 
 
-
-
-
-
-
-
-// console.log(alunosFilter('20151001001'));
+console.log(getAlunoDisciplina('Desenvolvimento'));
 

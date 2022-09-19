@@ -27,12 +27,30 @@ const getCursos = () => {
             }
         )
     })
-return listaCursos
+    return listaCursos
 }
 
+const getCursosByName = (id) => {
+    let nomeCurso = id;
+    let listaDosCursos = []
 
-console.log(getCursos());
+    cursos.forEach(item => {
+        if (item.nome.toLowerCase().includes(nomeCurso.toLowerCase())) {
+            let curso = {}
+
+            curso.nome = item.nome
+            curso.sigla = item.sigla
+            curso.carga = item.carga
+            curso.icone = item.icone
+
+            listaDosCursos.push(curso)
+        }
+    })
+    return listaDosCursos
+}
 
 module.exports = {
-    getCursos
+    getCursos, getCursosByName
 }
+
+console.log(getCursosByName('Desenvolvimento'));
