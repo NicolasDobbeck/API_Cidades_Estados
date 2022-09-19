@@ -1,34 +1,16 @@
-/*
-    --Bibliotecas necessarias para criar uma API--
-        * É uma bilioteca para criar aplicacoes em node no formato 
-            de API
-            express - (npm install express --save)
-        * É uma biblioteca para manipular as permissoes 
-            do protocolo https 
-            cors - (npm install cors --save)
-        * É uma biblioteca que permite manipular o corpo do protocolo https
-            body-parser - (npm install body-parser --save)
-*/
+//import da biblioteca do express
+const express =  require('express')
 
-//import da biblioteca do express para criar a API
-const express = require('express');
+//import da biblioteca do cors
+const cors = require('cors')
 
-//import da biblioteca do cors para manipular as permissões protocolo http
-const cors = require('cors');
+//import da biblioteca do body-parser
+const bodyParser = require('body-parser')
 
-//import da biblioteca do body-parser que irá manipular os corpos das requisisões do protocolo http
-const bodyParser = require('body-parser');
-const { request } = require('express');
+//import das funcoes utilizadas
+const {alunosFilter, getAlunos, getAlunoCurso, getAlunoDisciplina, alunoAno} = require('./alunos.js');
+const {getCursos} = require('./module/cursos.js');
 
-//Cria um objeto chamado app que será especialista nas funções do express
-const app = express();
-
-//importe da funcao que lista os estados
-const { getListEstados, getEstado } = require('./modulo/estados.js');
-const {getCidades} = require('./modulo/cidades.js')
-
-// request - Receber dados
-// response - Devolve dados
 app.use((request, response, next) => {
     //header - contém permissão / segurança
     //body - dados(JSON)
@@ -39,64 +21,59 @@ app.use((request, response, next) => {
 
     //Estabelece que as opcoes acima serao respresentadas pelo cors
     app.use(cors());
-
     next();
 });
 
-//EndPoint: Listagem de estados
-app.get('/estados', cors(), async function (request, response, next) {
-    //Recebe o array de estados
-    let estados = getListEstados();
-    //Cria uma variavel do tipo JSON
-    let estadosJSON = {};
-    if (estados) 
-    {
-        //Criamos uma chave chamada uf para recebeber o array de estados
-        estadosJSON.uf = estados;
+//EndPoint: Busca aluno pela matricula
+app.get('/aluno/:matricula', cors(), async function(request, response, next){
+    let matricula = request.params.matricula;
+    let aluno = alunosFilter(matricula);
+    let alunoDescricao = {}
+
+    if (aluno) {
+        alunoDescricao.alunoInfo = aluno;
         response.status(200);
-        response.json(estadosJSON);
+        response.json(aluno);
     }else{
         response.status(404);
-        response.json('{message : "Nenhum item encontrado"}');
     }
+})
 
-});
+//Endpoint: Mostra todos os alunos 
+app.get('/alunos', cors(), async function(request, response, next){
+    let alunos = getAlunos();
+    let jsonAlunos = {}
 
-//Endpoint: Busca estados pela sigla
-app.get('/estado/:sigla', cors(), async function(request, response, next){
-    //Recebe a sigla enviada por parametro no EndPoint
-    let sigla = request.params.sigla;
-    //Chama a funcao que vai localizar o estado solicitado
-    let estado = getEstado(sigla);
-
-    if(estado)
-    {
+    if (alunos) {
+        jsonAlunos.alunos = alunos
         response.status(200);
-        response.json(estado);
-    }else
-    {
+        response.json(alunos);
+    }else{
         response.status(404);
+    
     }
     
-});
+})
 
-//EndPoint: Listagem de cidades
-app.get('/cidades/:sigla', cors(), async function (request, response, next) {
-    let sigla = request.params.sigla;
-    let cidades = getCidades(sigla);
-    let cidadesJSON = {};
+app.get('/disciplinas/:matricula', cors(), async function(request, response, next){
+    let id = request.params.matricula;
+    
+})
 
-    if (cidades) {
-        cidadesJSON.city = cidades;
-        response.status(200);
-        response.json(cidadesJSON);
-    }else{
-        response.status(404);
-    }
-});
+app.get('/cursos', cors(), async function(request, response, next){
+    let cursos = getCursos();
+    let jsonCursos = {};
+    
+    if (cursos) {
+        jsonCursos.cursos = cursos;
+        response.status(200)
+        response.json(jsonCursos)
+    }else[
+        response.status(404)
+    ]
+})
 
-//Para que os EndPoints possam estar funcionando, precisamos obrigatoriamente finalizar
-//a API essa function, que representa o start da API
-app.listen(3030, function () {
+
+app.listen(3030, function(){
     console.log('Servidor aguardando requisicoes');
 })
